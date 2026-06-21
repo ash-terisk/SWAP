@@ -12,4 +12,4 @@ Build a scalable document indexing pipeline.
 Support efficient keyword-based document retrieval.
 Rank search results by relevance instead of simple keyword presence.
 Provide intelligent autocomplete suggestions.
-Demonstrate real-world applications of fundamen
+
