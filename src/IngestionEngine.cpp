@@ -11,6 +11,18 @@ IngestionEngine::IngestionEngine(string path) {
 
 string IngestionEngine::cleanToken(const string& raw_word) {
     string clean = "";
+
+
+
+
+
+
+
+
+
+
+
+    
     for (char c : raw_word) {
         if (isalnum(c)) clean += tolower(c);
     }
