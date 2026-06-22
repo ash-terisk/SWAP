@@ -1,4 +1,4 @@
-# SWAP
+# Document Retreival Engine
 SWAP: Smart Web-Scale Approximation Prototype
 A Local Search Engine Built from Fundamental Data Structures
 Project Overview
