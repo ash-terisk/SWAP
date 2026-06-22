@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 struct Document {
     int doc_id;
@@ -13,7 +14,19 @@ struct Document {
 struct Posting {
     int doc_id;
     int term_frequency;
-    std::vector<int> positions;
+    std::vector<int> positions; // Changed from 'posn' so Person A and B match
+};
+
+struct Corpusdata {
+    int tot_doc;
+    double avg_doc_len;
+    std::unordered_map<int, int> doc_len;
+};
+
+struct SearchRes {
+    int doc_id; 
+    double score;
+    bool operator>(const SearchRes& other) const { return score > other.score; }
 };
 
 #endif

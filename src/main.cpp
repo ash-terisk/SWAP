@@ -1,36 +1,56 @@
 #include <iostream>
+#include <string>
 #include "IngestionEngine.h"
-
-using namespace std;
+#include "tf_idf_search.h"
 
 int main() {
-    // 1. Turn on the Engine
-    IngestionEngine engine("../data");
+    // Change this to the path where your .txt files are located
+    std::string data_path = "C:\\Users\\sahua\\OneDrive\\Desktop\\SWAP-Engine\\data"; 
+    
+    // 1. Build the index
+    IngestionEngine engine(data_path);
     engine.buildIndexes();
 
-    cout << "\n--- TESTING DATA ACCESS ---\n";
+    const auto& registry = engine.getRegistry();
+    const auto& inv_index = engine.getInvertedIndex();
 
-    // 2. Safely grab the Inverted Index!
-    // The 'const auto&' is CRITICAL here. It means we are just LOOKING at the 
-    // original database. If you forget the '&', C++ will accidentally copy 
-    // the entire massive dictionary into new memory!
-    const auto& my_index = engine.getInvertedIndex();
+    // 2. Initialize the TF-IDF searcher with Person A's data
+    TFIDFSearch searcher(inv_index, registry);
 
-    // 3. Let's test if we can find a specific word
-    string test_word = "search";
+    std::cout << "\n=== TF-IDF Testing Environment ===\n";
+    std::cout << "Type 'exit' to quit.\n\n";
 
-    // Check if the word actually exists in the map
-    if (my_index.count(test_word) > 0) {
-        cout << "SUCCESS: The word '" << test_word << "' was found!\n";
-        cout << "It appears in " << my_index.at(test_word).size() << " documents.\n";
+    // 3. Simple text loop to test the search
+    while (true) {
+        std::string query;
+        std::cout << "Enter search query: ";
+        std::getline(std::cin, query);
 
-        // Loop through the Postings for this specific word
-        for (const auto& posting : my_index.at(test_word)) {
-            cout << " -> Found in Doc ID: " << posting.doc_id 
-                 << " | Times appeared: " << posting.term_frequency << "\n";
+        if (query == "exit") break;
+        if (query.empty()) continue;
+
+        std::vector<SearchRes> results = searcher.execute_search(query);
+
+        std::cout << "\n--- Top Results ---\n";
+        if (results.empty()) {
+            std::cout << "No matching documents found.\n";
+        } else {
+            for (size_t i = 0; i < results.size(); ++i) {
+                // Find filepath from registry
+                std::string filepath = "Unknown";
+                for (const auto& doc : registry) {
+                    if (doc.doc_id == results[i].doc_id) {
+                        filepath = doc.filepath;
+                        break;
+                    }
+                }
+                
+                std::cout << (i + 1) << ". Doc ID: " << results[i].doc_id 
+                          << " | File: " << filepath 
+                          << " | Score: " << results[i].score << "\n";
+            }
         }
-    } else {
-        cout << "The word '" << test_word << "' does not exist in the database.\n";
+        std::cout << "-------------------\n\n";
     }
 
     return 0;
